@@ -14,6 +14,10 @@ def main():
     user_agent = UserAgent(verify_ssl=False)
     filename = 'vaccine-booking-details.json'
     mobile = None
+
+    print('Running Script')
+    beep(500, 150)
+
     try:
         base_request_header = {
             'User-Agent': user_agent.random,

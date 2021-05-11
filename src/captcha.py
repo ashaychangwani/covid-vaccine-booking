@@ -1,25 +1,34 @@
+import copy
+import datetime
 import json
-from hashlib import sha256
-from collections import Counter
-from inputimeout import inputimeout, TimeoutOccurred
-import tabulate, copy, time, datetime, requests, sys, os, random
-from cairosvg import svg2png
-from PIL import Image, ImageEnhance
-from io import BytesIO
-import requests
-import numpy as np
+import os
+import random
 import re
+import sys
+import time
+from collections import Counter
+from hashlib import sha256
+from io import BytesIO
+
 import cv2
+import numpy as np
 import pytesseract
+import requests
+import tabulate
+from cairosvg import svg2png
+from inputimeout import TimeoutOccurred, inputimeout
+from PIL import Image, ImageEnhance
 
 
 def captcha_buider(resp):
-    from svglib.svglib import svg2rlg
-    from reportlab.graphics import renderPM
     from PIL import Image
+    from reportlab.graphics import renderPM
+    from svglib.svglib import svg2rlg
 
+
+def captcha_builder(resp):
     with open('captcha.svg', 'w') as f:
-        f.write(resp['captcha'])
+        f.write(re.sub('(<path d=)(.*?)(fill=\"none\"/>)', '', resp['captcha']))
 
     drawing = svg2rlg('captcha.svg')
     renderPM.drawToFile(drawing, "captcha.png", fmt="PNG")

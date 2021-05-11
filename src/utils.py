@@ -1,18 +1,25 @@
+import copy
+import datetime
 import json
-from hashlib import sha256
-from collections import Counter
-from inputimeout import inputimeout, TimeoutOccurred
-import tabulate, copy, time, datetime, requests, sys, os, random
-from captcha import captcha_solver
-from cairosvg import svg2png
-from PIL import Image, ImageEnhance
-from io import BytesIO
-import requests
-import numpy as np
+import os
+import random
 import re
-import cv2
-import pytesseract
+import sys
+import time
+from collections import Counter
+from hashlib import sha256
+from io import BytesIO
 
+import cv2
+import numpy as np
+import pytesseract
+import requests
+import tabulate
+from cairosvg import svg2png
+from inputimeout import TimeoutOccurred, inputimeout
+from PIL import Image, ImageEnhance
+
+from captcha import captcha_solver
 
 BOOKING_URL = "https://cdn-api.co-vin.in/api/v2/appointment/schedule"
 BENEFICIARIES_URL = "https://cdn-api.co-vin.in/api/v2/appointment/beneficiaries"
@@ -188,15 +195,16 @@ def collect_user_details(request_header):
 
     # Get search start date
     start_date = input(
-        '\nSearch for next seven day starting from when?\nUse 1 for today, 2 for tomorrow, or provide a date in the format yyyy-mm-dd. Default 2: ')
+        '\nSearch for next seven day starting from when?\nUse 1 for today, 2 for tomorrow, or provide a date in the format DD-MM-YYYY. Default 2: ')
     if not start_date:
         start_date = 2
     elif start_date in ['1', '2']:
         start_date = int(start_date)
     else:
         try:
-            datetime.datetime.strptime(start_date, '%Y-%m-%d')
+            datetime.datetime.strptime(start_date, '%d-%m-%Y')
         except ValueError:
+            print('Invalid Date! Proceeding with tomorrow.')
             start_date = 2
 
     # Get preference of Free/Paid option
@@ -314,7 +322,7 @@ def check_calendar_by_pincode(request_header, vaccine_type, location_dtls, start
 def generate_captcha(request_header):
     print('================================= GETTING CAPTCHA ==================================================')
     resp = requests.post(CAPTCHA_URL, headers=request_header)
-    print(f'Booking Response Code: {resp.status_code}')
+    print(f'Captcha Response Code: {resp.status_code}')
 
     if resp.status_code == 200:
         return captcha_solver(resp.json())
@@ -493,7 +501,7 @@ def get_fee_type_preference():
 
 def get_pincodes():
     locations = []
-    pincodes = input("Enter comma separated index numbers of pincodes to monitor: ")
+    pincodes = input("Enter comma separated pincodes to monitor: ")
     for idx, pincode in enumerate(pincodes.split(',')):
         pincode = {
             'pincode': pincode,
@@ -692,3 +700,4 @@ def generate_token_OTP(mobile, request_header):
 
         except Exception as e:
             print(str(e))
+

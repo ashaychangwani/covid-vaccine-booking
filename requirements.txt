@@ -8,3 +8,4 @@ opencv-python
 pytesseract
 cairosvg
 fake_useragent
+pysimplegui
