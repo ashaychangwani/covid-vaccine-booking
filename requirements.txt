@@ -4,3 +4,7 @@ inputimeout
 svglib==1.0.1
 reportlab
 pyinstaller
+opencv-python
+pytesseract
+cairosvg
+fake_useragent

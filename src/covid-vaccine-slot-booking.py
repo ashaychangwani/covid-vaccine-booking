@@ -5,18 +5,18 @@ from types import SimpleNamespace
 import requests, sys, argparse, os, datetime
 from utils import generate_token_OTP, check_and_book, beep, BENEFICIARIES_URL, WARNING_BEEP_DURATION, \
     display_info_dict, save_user_info, collect_user_details, get_saved_user_info, confirm_and_proceed
-
+from fake_useragent import UserAgent
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--token', help='Pass token directly')
     args = parser.parse_args()
-
+    user_agent = UserAgent(verify_ssl=False)
     filename = 'vaccine-booking-details.json'
     mobile = None
     try:
         base_request_header = {
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36',
+            'User-Agent': user_agent.random,
         }
 
         if args.token:
@@ -73,25 +73,14 @@ def main():
                                          fee_type=info.fee_type)
 
             # check if token is still valid
-            beneficiaries_list = requests.get(BENEFICIARIES_URL, headers=request_header)
-            if beneficiaries_list.status_code == 200:
-                token_valid = True
-
-            else:
+            if not token_valid:
                 # if token invalid, regenerate OTP and new token
                 beep(WARNING_BEEP_DURATION[0], WARNING_BEEP_DURATION[1])
                 print('Token is INVALID.')
                 token_valid = False
 
-                tryOTP = input('Try for a new Token? (y/n Default y): ')
-                if tryOTP.lower() == 'y' or not tryOTP:
-                    if not mobile:
-                        mobile = input("Enter the registered mobile number: ")
-                    token = generate_token_OTP(mobile, base_request_header)
-                    token_valid = True
-                else:
-                    print("Exiting")
-                    os.system("pause")
+                token = generate_token_OTP(mobile, base_request_header)
+                token_valid = True
 
     except Exception as e:
         print(str(e))

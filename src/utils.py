@@ -3,7 +3,16 @@ from hashlib import sha256
 from collections import Counter
 from inputimeout import inputimeout, TimeoutOccurred
 import tabulate, copy, time, datetime, requests, sys, os, random
-from captcha import captcha_buider
+from captcha import captcha_solver
+from cairosvg import svg2png
+from PIL import Image, ImageEnhance
+from io import BytesIO
+import requests
+import numpy as np
+import re
+import cv2
+import pytesseract
+
 
 BOOKING_URL = "https://cdn-api.co-vin.in/api/v2/appointment/schedule"
 BENEFICIARIES_URL = "https://cdn-api.co-vin.in/api/v2/appointment/beneficiaries"
@@ -60,6 +69,8 @@ def viable_options(resp, minimum_slots, min_age_booking, fee_type):
                     options.append(out)
 
                 else:
+                    print(session['available_capacity'])
+                    print(session['available_capacity'] >= minimum_slots,'\t',session['min_age_limit'] <= min_age_booking,center['fee_type'] in fee_type)
                     pass
     else:
         pass
@@ -173,8 +184,7 @@ def collect_user_details(request_header):
         minimum_slots = len(beneficiary_dtls)
 
     # Get refresh frequency
-    refresh_freq = input('How often do you want to refresh the calendar (in seconds)? Default 15. Minimum 5. : ')
-    refresh_freq = int(refresh_freq) if refresh_freq and int(refresh_freq) >= 5 else 15
+    refresh_freq = 1
 
     # Get search start date
     start_date = input(
@@ -307,9 +317,7 @@ def generate_captcha(request_header):
     print(f'Booking Response Code: {resp.status_code}')
 
     if resp.status_code == 200:
-        captcha_buider(resp.json())
-        captcha = input('Enter Captcha: ')
-        return captcha
+        return captcha_solver(resp.json())
 
 
 def book_appointment(request_header, details):
@@ -351,7 +359,7 @@ def book_appointment(request_header, details):
 
             else:
                 print(f'Response: {resp.status_code} : {resp.text}')
-                return True
+                pass
 
     except Exception as e:
         print(str(e))
@@ -416,15 +424,15 @@ def check_and_book(request_header, beneficiary_dtls, location_dtls, search_optio
                 choice = f'1.{random_slot}'
             else:
                 choice = inputimeout(
-                    prompt='----------> Wait 20 seconds for updated options OR \n----------> Enter a choice e.g: 1.4 for (1st center 4th slot): ',
-                    timeout=20)
+                    prompt='----------> Wait 5 seconds for updated options OR \n----------> Enter a choice e.g: 1.4 for (1st center 4th slot): ',
+                    timeout=5)
 
         else:
             for i in range(refresh_freq, 0, -1):
                 msg = f"No viable options. Next update in {i} seconds.."
                 print(msg, end="\r", flush=True)
                 sys.stdout.flush()
-                time.sleep(1)
+                time.sleep(0.1)
             choice = '.'
 
     except TimeoutOccurred:
