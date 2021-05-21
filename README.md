@@ -17,10 +17,11 @@
 
 ### Noteworthy Forks
 - https://github.com/bombardier-gif/covid-vaccine-booking : I haven't tried this personally but, it looks like a promising, bit more automated solution that would require some more setting up.
+- https://github.com/vishalv26/covid-vaccine-booking : Haven't personally tried this either. It uses portable python and simplifies running the code by avoiding the need for separate Python installation.
 
 ### Usage:
 
-EXE file does not work anymore but the **Python 3.7** code does. If you don't already have Python and do not know how to set it up, instructions are at the bottom. It's not complicated at all and takes literally 5 minutes. Please do that and come back here.
+EXE file that was being built via ```pyinstaller``` on GitHub Actions does not work anymore but the **Python 3.7** code still does. If you don't already have Python and do not know how to set it up, instructions are at the bottom. It's not complicated at all and takes literally 5 minutes. Please do that and come back here.
 
 Download this code as zip, and extract it to some folder like ```C:\temp\covid-vaccine-booking```. Going by this structure, the py files should be in ```C:\temp\covid-vaccine-booking\src```. 
 
@@ -31,11 +32,13 @@ Install all the dependencies with the below. This is a one-time activity (for an
 pip install -r requirements.txt
 ```
 
-If you're on Linux, install the beep package before running the Python script. To install, run:
+If you're on Linux or MacOS, install the SoX ([Sound eXchange](http://sox.sourceforge.net/ "Sound eXchange")) before running the Python script. To install, run:
+
+Ubuntu:
 ```
-sudo apt-get install beep
+sudo apt install sox
 ```
-If you're on MacOS, install the SoX ([Sound eXchange](http://sox.sourceforge.net/ "Sound eXchange")) before running the Python script. To install, run:
+MacOS:
 ```
 brew install sox
 ```
